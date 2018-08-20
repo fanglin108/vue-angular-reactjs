@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+<title>VUE slot</title>
+<script src="./node_modules/vue/dist/vue.js"></script>
+</head>
+<body>
+    <div id="app"></div>
+
+    <script>
+        Vue.component('VNameSlot', {
+            template: `
+                <div>
+                    <h2>
+                        <slot name="one"></slot>
+                    </h2>
+                    <h3>    
+                        <slot name="two"></slot>
+                    </h3>        
+                </div>
+            `
+        })
+
+        var App = {
+            template: `
+                <div>
+                    <VNameSlot>
+                        <div slot="two">第一个坑</div>
+                        <div slot="one">第二个坑</div>
+                    </VNameSlot>
+
+                    测试filter过滤器：<input type="text" v-model="name" />
+                    <div>filter后的值：{{name | filter1}}</div>
+                </div>
+            `,
+            data: function(){
+                return {
+                    name: ' '
+                }
+            },
+
+            filters: {
+                filter1: function(value){
+                    return Array.from(value).reverse().join('')
+                }
+            }
+        }
+
+        new Vue({
+            el: '#app',
+            template: `
+                <App></App>
+            `,
+
+            components: {
+                App
+            }
+        })
+    </script>
+</body>
+</html>

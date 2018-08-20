@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+<title>vue $refs</title>
+<script src="./node_modules/vue/dist/vue.js"></script>
+</head>
+<body>
+    <div id="app"></div>
+</body>
+<script>
+
+var VHead = {
+    template: `
+        <div>
+            <header>this is header.</header>
+        </div>
+    `,
+}
+
+Vue.component('VHeadCommon', VHead);
+
+var App = {
+    template: `
+        <div>
+            <VHeadCommon ref="btn3"></VHeadCommon>
+            <div>
+                <button ref="btn1">我是按钮1</button>
+                <button ref='btn2'>我是按钮2</button>
+            </div>
+        </div>
+    `,
+    mounted: function(){
+        // 说明：如果是给标签绑定ref属性，则this.$refs.xx获取到的是原生的js的DOM对象
+        //如果是给组件绑定ref属性，则this.$refs.xx获取的是组件对象
+        var btn2 = this.$refs.btn2;
+        console.log(this.$refs.btn1);
+        console.log(this.$refs.btn2);
+        console.log(this.$refs.btn3);
+        btn2.style.color="red"
+    }
+}
+
+new Vue({
+    el: '#app',
+    template: `
+        <App></App>
+    `,
+    components: {
+        App,
+    }
+})
+</script>
+</html>

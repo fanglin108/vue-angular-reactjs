@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+<title>vue axios的使用</title>
+<script src="./node_modules/vue/dist/vue.js"></script>
+<script src="./node_modules/vue-router/dist/vue-router.js"></script>
+<script src="./node_modules/axios/dist/axios.js"></script>
+</head>
+<body>
+    <div id="app"></div>
+
+    <script>
+    var Btn = {
+        template: `
+            <div>
+                <button @click="sendAjax">发送请求</button>
+                <div>请求1数据：{{data}}</div>
+                <div>请求2数据：{{data2}}</div>
+            </div>
+        `,
+        data: function() {
+            return {
+                data: '',
+                data2: ''
+            }
+        },
+        methods: {
+            sendAjax() {
+                /*
+                // 单次请求
+                this.$axios.get('http://127.0.0.1:8888/')
+                .then((response) => {
+                    console.log(response);
+                    this.data = response.data;
+                    
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+                */
+
+                // 合并请求,并测试transformRequest, transformResponse的使用
+                this.$axios.defaults.baseURL = 'http://127.0.0.1:8888';
+                this.$axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
+                var reqOne = this.$axios.get('/');
+                var reqTwo = this.$axios.post('/post', 
+                   
+                        //name: 'fanglin',
+                        //age: 30
+                        "name=fanglin&age=30"
+                    ,
+                    {
+                        transformRequest: [function(data){
+                            console.log('请求的数据：', data);
+                            data  = data.replace(/fanglin/, "wtt");
+                            console.log('请求被修改后数据：', data);
+                            return data;
+                        }],
+                        transformResponse: [function(data){
+                            var data = JSON.parse(data);
+                            console.log('响应的数据:', data);
+                            return data;
+                        }]
+                    },
+                    
+                );
+
+                this.$axios.all([reqOne, reqTwo])
+                .then(this.$axios.spread((res1, res2) => {
+                    //console.log(res1);
+                    //console.log(res2);
+                    this.data = res1.data;
+                    this.data2 = res2.data;
+                }))
+                .catch((error) => {
+                    console.log(error);
+                });
+            }
+        }
+    }
+
+    var App = {
+        template: `
+            <div>
+                <Btn></Btn>
+            </div>
+        `,
+        data: function() {
+            return {
+            
+            }
+        },
+        created: function() {
+          
+        },
+        methods: {
+
+        }, 
+        components: {
+            Btn
+        }
+    }
+
+    Vue.prototype.$axios = axios;
+    new Vue({
+        el: '#app',
+        template: `
+            <App></App>
+        `,
+        components: {
+            App
+        }
+    })
+
+
+
+    </script>
+</body>
+</html>

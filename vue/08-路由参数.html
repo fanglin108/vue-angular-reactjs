@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+<title>vue路由参数</title>
+<script src="./node_modules/vue/dist/vue.js"></script>
+<script src="./node_modules/vue-router/dist/vue-router.js"></script>
+</head>
+<body>
+    <div id="app"></div>
+</body>
+<script>
+    var ParamsTest = {
+        template: `
+            <div>
+               <div>{{result}}</div>
+               <div>{{$route.params}}</div>
+            </div>
+        `,
+        data: function() {
+            return {
+                result: '',
+            }
+        },
+        created: function() {
+            this.result = this.$route.params
+            console.log(this.$route);
+        },
+    }
+
+    var QueryParams = {
+        template: `
+            <div>
+              <div>{{result}}</div>
+              <div>{{$route.query}}</div>
+            </div>
+        `,
+        data: function() {
+            return {
+                result: '',
+            }
+        },
+        created: function() {
+            this.result = this.$route.query
+            console.log(this.$route);
+        },
+    }
+
+    var App = {
+        template: `
+            <div>
+                <router-link :to="{name: 'user1', params: {id: 111}}">获取params参数</router-link> 
+                <router-link :to="{name: 'user2', query: {id: 222, name: 'aaa'}}">获取query参数</router-link>
+                <router-view></router-view>
+            </div>
+        `,
+    }
+
+    const routes = [
+      { path: '/user/:id', name: 'user1',  component: ParamsTest },
+      { path: '/user', name: 'user2', component: QueryParams }
+    ]
+
+    const router = new VueRouter({
+      routes
+    })
+
+    new Vue({
+        el: "#app",
+        router,
+        template: `
+            <div>
+                <App></App>
+            </div>
+        `,
+        components: {
+            App
+        }
+    });
+</script>
+</html>

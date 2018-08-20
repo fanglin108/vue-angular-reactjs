@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+<title>VUE slot</title>
+<script src="./node_modules/vue/dist/vue.js"></script>
+<style>
+#header {
+    height: 60px;
+    line-height: 60px;
+    background: #e1e1e1;
+}
+
+#aside{
+    float:left;
+    width:20%;
+    height:500px;
+    background: #999;
+}
+
+#main{
+    float: left;
+    background: #666;
+    width: 80%;
+    height: 500px;
+}
+.default{
+    color:#999;
+}
+.primary{
+    color:blue;
+}
+.success{
+    color:green;
+}
+.error{
+    color:red;
+}
+</style>
+</head>
+<body>
+
+<!--
+
+-->
+<div id="app"></div>
+
+<script>
+    // 组件全局注册
+    Vue.component('VButton', {
+        props: ['type'],
+        template: `
+            <button class="default" :class="type"><slot></slot></button>
+        `        
+    });
+
+
+    // 组件局部注册
+    var VHeader = {
+        props:['fontSize'],
+        template: `
+            <div>
+                {{msg}} - {{fontSize}}
+                <button v-on:click="changeFontSize">Change fontSize</button>
+            </div>
+          `,
+        data() { // 组件的data必须是一个函数，因为这样每个实例才可以维护一份被返回对象的独立的拷贝
+            return {
+                msg: 'Header',
+            }
+        },
+        methods: {
+            changeFontSize(){
+                this.$emit('change')
+            }
+        }
+    };
+
+    var VAside = {
+        template: `
+            <div>
+                {{msg}}
+                <VButton type="success">Slot按钮名</VButton>
+            </div>
+        `,
+        data() { // 组件的data必须是一个函数
+            return {
+                msg: 'aside'
+            }
+        }
+    };
+
+    var VMain = {
+        props: ['posts'],
+        template: `
+            <div>{{msg}} 
+            <ul>
+              <li v-for="post in posts">{{post.id}} {{post.title}}</li>
+            </ul>
+            </div>
+        `,
+        data() { // 组件的data必须是一个函数
+            return {
+                msg: 'main'
+            }
+        }
+    };
+
+    var App = {
+        template: `
+            <div v-bind:style="{ fontSize: fontSize + 'px' }">
+                <div id="header">
+                    <VHeader @change="changeHandler" v-bind:fontSize="fontSize" />
+                </div>
+                <div id="aside">
+                    <VAside />
+                </div>
+                <div id="main">
+                    <VMain v-bind:posts="posts"></VMain>
+                    <button v-on:click="getPosts">添加post</button>
+                </div>
+                
+            </div>
+        `,
+        data() {
+            return {
+                postId: 4,
+                posts: [
+                    {id:1, title: '标题111'},
+                    {id:2, title: '标题222'},
+                    {id:3, title: '标题333'},
+                ],
+                fontSize: 16,
+            }
+
+        },
+        components: {
+            VHeader,
+            VAside:VAside,
+            VMain,
+        },
+        methods: {
+            getPosts:function(){
+                this.posts.push({id:this.postId, title:`标题${this.postId}${this.postId}${this.postId}`});
+                this.postId++;
+            },
+
+            changeHandler() {
+                this.fontSize++;
+            }
+        }
+    }
+
+
+    new Vue({
+        el:"#app",
+        template: `
+            <App></App>
+        `,
+        data: function(){
+            return {
+              
+            }
+        },
+        // 组件局部注册的使用
+        components: {
+            App,
+        }
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+<title>VUE Component</title>
+<script src="./node_modules/vue/dist/vue.js"></script>
+<style>
+#header {
+    height: 60px;
+    line-height: 60px;
+    background: #e1e1e1;
+}
+
+#aside{
+    float:left;
+    width:20%;
+    height:500px;
+    background: #999;
+}
+
+#main{
+    float: left;
+    background: #666;
+    width: 80%;
+    height: 500px;
+}
+</style>
+</head>
+<body>
+
+<!--
+一、父组件向子组件传递数据
+    1.父组件App中获取到数据后通地v-bind绑定自定义属性到子组件VMain
+    2.子组件VMain通过定义props接收传过来的自定义属性名
+    3. 之后子组件可以像自己的数据一样处理传递过来的数据
+
+二、事件传递(示例：子组件操作父组件中数据)
+    1. 父组件App通过在Vhead子组件中自定义事件change传递到子组件中
+    2. 子组件中即可通过this.$emit调用父组件中绑定的方法，甚至达到改变父组件中数据的目的。
+-->
+<div id="app"></div>
+
+<script>
+    // 组件全局注册
+    Vue.component('VButton', {
+        template: `
+            <button>按钮</button>
+        `        
+    });
+
+
+    // 组件局部注册
+    var VHeader = {
+        props:['fontSize'],
+        template: `
+            <div>
+                {{msg}} - {{fontSize}}
+                <button v-on:click="changeFontSize">添加post</button>
+            </div>
+          `,
+        data() { // 组件的data必须是一个函数，因为这样每个实例才可以维护一份被返回对象的独立的拷贝
+            return {
+                msg: 'Header',
+            }
+        },
+        methods: {
+            changeFontSize(){
+                this.$emit('change')
+            }
+        }
+    };
+
+    var VAside = {
+        template: `
+            <div>{{msg}}</div>
+        `,
+        data() { // 组件的data必须是一个函数
+            return {
+                msg: 'aside'
+            }
+        }
+    };
+
+    var VMain = {
+        props: ['posts'],
+        template: `
+            <div>{{msg}} 
+            <ul>
+              <li v-for="post in posts">{{post.id}} {{post.title}}</li>
+            </ul>
+            </div>
+        `,
+        data() { // 组件的data必须是一个函数
+            return {
+                msg: 'main'
+            }
+        }
+    };
+
+    var App = {
+        template: `
+            <div v-bind:style="{ fontSize: fontSize + 'px' }">
+                <div id="header">
+                    <VHeader @change="changeHandler" v-bind:fontSize="fontSize" />
+                </div>
+                <div id="aside">
+                    <VAside />
+                </div>
+                <div id="main">
+                    <VMain v-bind:posts="posts"></VMain>
+                </div>
+                <button v-on:click="getPosts">添加post</button>
+            </div>
+        `,
+        data() {
+            return {
+                postId: 4,
+                posts: [
+                    {id:1, title: '标题111'},
+                    {id:2, title: '标题222'},
+                    {id:3, title: '标题333'},
+                ],
+                fontSize: 16,
+            }
+
+        },
+        components: {
+            VHeader,
+            VAside:VAside,
+            VMain,
+        },
+        methods: {
+            getPosts:function(){
+                this.posts.push({id:this.postId, title:`标题${this.postId}${this.postId}${this.postId}`});
+                this.postId++;
+            },
+
+            changeHandler() {
+                this.fontSize++;
+            }
+        }
+    }
+
+
+    new Vue({
+        el:"#app",
+        template: `
+            <App></App>
+        `,
+        data: function(){
+            return {
+              
+            }
+        },
+        // 组件局部注册的使用
+        components: {
+            App,
+        }
+    });
+</script>
+</body>
+</html>
